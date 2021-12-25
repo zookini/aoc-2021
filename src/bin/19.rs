@@ -1,5 +1,6 @@
-use std::collections::HashSet;
 use itertools::Itertools;
+
+type HashSet<T> = rustc_hash::FxHashSet<T>;
 
 fn main() {
     let mut scanners: Vec<Vec<[isize; 3]>> = include_str!("../../input/19.txt")

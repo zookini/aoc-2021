@@ -11,7 +11,7 @@ fn main() {
 
 fn solve<const N: usize>(burrow: &[[u8; 13]; N]) -> usize {
     let mut queue = std::collections::BinaryHeap::new();
-    let mut distances = std::collections::HashMap::new();
+    let mut distances = rustc_hash::FxHashMap::default();
 
     std::iter::successors(Some((0, *burrow)), |(cost, burrow)| {
         if distances.get(burrow).filter(|&&c| c < *cost).is_none() {

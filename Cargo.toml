@@ -9,3 +9,4 @@ authors = ["Prefectly Cromulent <prefectly.cromulent@gmail.com>"]
 [dependencies]
 bitvec="0.22"
 itertools = "0.10"
+rustc-hash = "1.1.0"

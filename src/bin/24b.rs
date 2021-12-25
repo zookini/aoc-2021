@@ -1,4 +1,4 @@
-type Cache = std::collections::HashMap<isize, usize>;
+type Cache = rustc_hash::FxHashMap<isize, usize>;
 
 fn main() {
     let ops: Vec<_> = include_str!("../../input/24.txt").lines().map(Op::parse).collect();
