@@ -1,22 +1,26 @@
-type Cache = rustc_hash::FxHashMap<isize, [usize; 2]>;
+type Cache = dashmap::DashMap<isize, [usize; 2], std::hash::BuildHasherDefault<rustc_hash::FxHasher>>;
+
+use rayon::prelude::*;
 
 fn main() {
     let ops: Vec<_> = include_str!("../../input/24.txt").lines().map(Op::parse).collect();
     let mut cache: Cache = [(0, [0, 0])].into_iter().collect();
 
     for chunk in ops.chunks(18) {
-        let mut next = Cache::default();
+        let next = Cache::default();
         
-        for ((cached, model), i) in itertools::iproduct!(cache, 1..=9) {
-            let mut vars = [0, 0, 0, cached];
+        cache.into_par_iter().for_each(|(cached, model)| {
+            for i in 1..=9 {
+                let mut vars = [0, 0, 0, cached];
 
-            for op in chunk {
-                op.run(&mut vars, i as isize);
+                for op in chunk {
+                    op.run(&mut vars, i as isize);
+                }
+
+                let model = [model[0] * 10 + i, model[1] * 10 + i];
+                next.entry(vars[3]).and_modify(|m| *m = [m[0].min(model[0]), m[1].max(model[1])]).or_insert(model);
             }
-
-            let model = [model[0] * 10 + i, model[1] * 10 + i];
-            next.entry(vars[3]).and_modify(|m| *m = [m[0].min(model[0]), m[1].max(model[1])]).or_insert(model);
-        }
+        });
 
         cache = next;
     }

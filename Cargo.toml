@@ -10,3 +10,5 @@ authors = ["Prefectly Cromulent <prefectly.cromulent@gmail.com>"]
 bitvec="0.22"
 itertools = "0.10"
 rustc-hash = "1.1.0"
+dashmap = { version = "5", features = ["rayon"] }
+rayon = "1.5"
