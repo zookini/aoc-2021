@@ -1,14 +1,8 @@
-type Cache = rustc_hash::FxHashMap<isize, usize>;
+type Cache = rustc_hash::FxHashMap<isize, [usize; 2]>;
 
 fn main() {
     let ops: Vec<_> = include_str!("../../input/24.txt").lines().map(Op::parse).collect();
-
-    println!("Part 1: {}", solve(&ops, |a, b| a > b));
-    println!("Part 2: {}", solve(&ops, |a, b| a < b));
-}
-
-fn solve(ops: &[Op], cmp: fn(a: usize, b: usize) -> bool) -> usize {
-    let mut cache: Cache = [(0, 0)].into_iter().collect();
+    let mut cache: Cache = [(0, [0, 0])].into_iter().collect();
 
     for chunk in ops.chunks(18) {
         let mut next = Cache::default();
@@ -20,14 +14,20 @@ fn solve(ops: &[Op], cmp: fn(a: usize, b: usize) -> bool) -> usize {
                 op.run(&mut vars, i as isize);
             }
 
-            let model = model * 10 + i;
-            next.entry(vars[3]).and_modify(|m| if cmp(model, *m) { *m = model }).or_insert(model);
+            let model = [model[0] * 10 + i, model[1] * 10 + i];
+            next.entry(vars[3]).and_modify(|m| *m = [m[0].min(model[0]), m[1].max(model[1])]).or_insert(model);
         }
 
         cache = next;
     }
 
-    cache.into_iter().filter_map(|(k, v)| (k == 0).then(|| v)).reduce(|a, b| if cmp(a, b) { a } else { b }).unwrap()
+    let [p1, p2] = cache
+        .into_iter()
+        .filter_map(|(z, model)| (z == 0).then(|| model))
+        .fold([usize::MAX, 0], |m1, m2| [m1[0].min(m2[0]), m1[1].max(m2[1])]);
+
+    println!("Part 1: {}", p1);
+    println!("Part 2: {}", p2);
 }
 
 enum Op {
