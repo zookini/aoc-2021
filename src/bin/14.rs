@@ -10,13 +10,13 @@ fn main () {
 
     std::iter::successors(Some(template.chars().tuple_windows().counts()), |pairs| Some(pairs
             .iter()
-            .flat_map(|(&(a, b), &c)| [((a, rules[&(a, b)]), c), ((rules[&(a, b)], b), c)])
+            .flat_map(|(&(a, b), &count)| [((a, rules[&(a, b)]), count), ((rules[&(a, b)], b), count)])
             .into_grouping_map()
             .sum()
         ))
         .zip(0..=40)
         .filter(|&(_, i)| i == 10 || i == 40)
-        .map(|(pairs, _)| pairs.into_iter().map(|((a, _), c)| (a, c)))
-        .map(|cs| std::iter::once((template.chars().last().unwrap(), 1)).chain(cs).into_grouping_map().sum())
-        .for_each(|cs| println!("{}", cs.values().max().unwrap() - cs.values().min().unwrap()));
+        .map(|(pairs, _)| pairs.into_iter().map(|((a, _), count)| (a, count)))
+        .map(|counts| counts.chain([(template.chars().last().unwrap(), 1)]).into_grouping_map().sum())
+        .for_each(|counts| println!("{}", counts.values().max().unwrap() - counts.values().min().unwrap()));
 }
